@@ -36,7 +36,7 @@ extern NSString * const ENSessionHostSandbox;
 extern NSString * const ENSessionDidAuthenticateNotification;
 extern NSString * const ENSessionDidUnauthenticateNotification;
 
-typedef void (^ENSessionAuthenticateCompletionHandler)(NSError * authenticateError);
+typedef void (^ENSessionAuthenticateCompletionHandler)(NSString *screenName, NSString *token, NSDate *expiration, NSError * authenticateError);
 typedef void (^ENSessionListNotebooksCompletionHandler)(NSArray * notebooks, NSError * listNotebooksError);
 typedef void (^ENSessionProgressHandler)(CGFloat progress);
 typedef void (^ENSessionUploadNoteCompletionHandler)(ENNoteRef * noteRef, NSError * uploadNoteError);

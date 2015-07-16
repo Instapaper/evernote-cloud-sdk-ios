@@ -317,7 +317,8 @@ static BOOL disableRefreshingNotebooksCacheOnLaunch;
     
     // Authenticate is idempotent; check if we're already authenticated
     if (self.isAuthenticated) {
-        completion(nil);
+        ENCredentials *credentials = [self primaryCredentials];
+        completion(self.user.username, credentials.authenticationToken, credentials.expirationDate, nil);
         return;
     }
 
@@ -325,7 +326,7 @@ static BOOL disableRefreshingNotebooksCacheOnLaunch;
     // don't stomp on it.
     if (self.authenticator) {
         ENSDKLogInfo(@"Cannot restart authentication while it is still in progress.");
-        completion([NSError errorWithDomain:ENErrorDomain code:ENErrorCodeUnknown userInfo:nil]);
+        completion(nil, nil, nil, [NSError errorWithDomain:ENErrorDomain code:ENErrorCodeUnknown userInfo:nil]);
         return;
     }
 
@@ -407,11 +408,19 @@ static BOOL disableRefreshingNotebooksCacheOnLaunch;
 
 - (void)completeAuthenticationWithError:(NSError *)error
 {
+    NSString *token = nil;
+    NSDate *expiration = nil;
     if (error) {
         [self unauthenticate];
     }
+    else {
+        ENCredentials *credentials = [self primaryCredentials];
+        token = credentials.authenticationToken;
+        expiration = credentials.expirationDate;
+    }
+
     if (self.authenticationCompletion) {
-        self.authenticationCompletion(error);
+        self.authenticationCompletion(self.user.username, token, expiration, error);
         self.authenticationCompletion = nil;
     }
     self.authenticator = nil;
